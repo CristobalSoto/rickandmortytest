@@ -1,7 +1,6 @@
 const fetch = require("node-fetch");
 
 console.time("apptimer")
-const baseUrl = 'https://rickandmortyapi.com/api'
 
 // Since there is no way to remove pagination from the documentation we are using a trick
 // a function to create an array with the numbers of characters, locations and episodes to get them all with 1 request each
@@ -19,6 +18,10 @@ function getCharacterId(character) {
   return splitterCharacter[splitterCharacter.length-1]
 }
 
+function countLetter(list, letter) {
+  return list.reduce((accumulator, currentValue) => reducer(accumulator, currentValue, letter), 0)
+}
+
 function reducer(accumulator, currentValue, letter) {
   if (currentValue.name.toLowerCase().indexOf(letter)) {
     accumulator = accumulator + 1;
@@ -26,7 +29,7 @@ function reducer(accumulator, currentValue, letter) {
   return accumulator
 };
 
-async function getData() {
+async function getData(baseUrl) {
   const responseCharacters = await fetch(`${baseUrl}/character/${charactersArray}`)
   const responseLocations = await fetch(`${baseUrl}/location/${locationsArray}`)
   const responseEpisodes = await fetch(`${baseUrl}/episode/${episodesArray}`)
@@ -38,7 +41,7 @@ async function getData() {
   return [characters, locations, episodes]
 }
 
-getData()
+getData('https://rickandmortyapi.com/api')
   .then(([characters, locations, episodes])=> {
     countLetterL = countLetter(locations, 'l');
     countLetterE = countLetter(episodes, 'e');
@@ -52,7 +55,9 @@ getData()
       console.log(`Episodio ${episode.id}`);
       episode.characters.forEach(character => {
         characterId = getCharacterId(character)
-        console.log(`Character: ${characters[characterId-1]['name']} Location: ${characters[characterId-1]['origin']['name']}`);
+        characterName = characters[characterId-1]['name']
+        characterOrigin = characters[characterId-1]['origin']['name']
+        console.log(`Character: ${characterName} Location: ${characterOrigin}`);
 
       });
     });
